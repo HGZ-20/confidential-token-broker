@@ -5,14 +5,31 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: [self-hosted, Linux, X64]
     steps:
-      - name: Switch to the working directory
-        run: |
-          cd ~/actions-runner/work
       - name: Check out repository code
         uses: actions/checkout@v4
+      - name: Initialize submodules
+        run: |
+          git submodule init
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+      - name: build server
         run: |
-          ls ${{ github.workspace }}
+          cd server
+          make clean
+          make
+          cd ../
+      - name: build client
+        run: |
+          cd client
+          cargo clean
+          cargo build
+          cd ../
+      - name: clean
+        run: |
+          cd server
+          make clean
+          cd ../
+          cd client
+          cargo clean
+          cd ../
       - run: echo "🍏 This job's status is ${{ job.status }}."
